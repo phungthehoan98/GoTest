@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"go_test/pkg/models/mysql"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -12,9 +13,15 @@ import (
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	snippets *mysql.SnippetModel
+	errorLog      *log.Logger
+	infoLog       *log.Logger
+	snippets      *mysql.SnippetModel
+	templateCache map[string]*template.Template
+}
+
+type ExampleModel struct {
+	DB         *sql.DB
+	InsertStmt *sql.Stmt
 }
 
 func main() {
@@ -31,10 +38,16 @@ func main() {
 	}
 	defer db.Close()
 
+	templateCache, err := newTemplateCache("./ui/html/")
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		snippets: &mysql.SnippetModel{DB: db},
+		errorLog:      errorLog,
+		infoLog:       infoLog,
+		snippets:      &mysql.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 	srv := &http.Server{
 		Addr:     *addr,
@@ -50,8 +63,10 @@ func main() {
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
+	db.SetMaxOpenConns(95)
+	db.SetMaxIdleConns(5)
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
