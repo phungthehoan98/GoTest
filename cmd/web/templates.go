@@ -1,15 +1,29 @@
 package main
 
 import (
+	"go_test/pkg/forms"
 	"go_test/pkg/models"
 	"html/template"
+	"net/url"
 	"path/filepath"
+	"time"
 )
 
 type templateData struct {
 	CurrentYear int
+	Form        *forms.Form
+	FormData    url.Values
+	FormErrors  map[string]string
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
+}
+
+func humanDate(t time.Time) string {
+	return t.Format("01 Jan 2024 at 01:01")
+}
+
+var functions = template.FuncMap{
+	"humanDate": humanDate,
 }
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
@@ -20,7 +34,7 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	}
 	for _, page := range pages {
 		name := filepath.Base(page)
-		ts, err := template.ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return nil, err
 		}
