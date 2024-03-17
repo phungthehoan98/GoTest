@@ -4,18 +4,20 @@ import (
 	"go_test/pkg/forms"
 	"go_test/pkg/models"
 	"html/template"
-	"net/url"
+
+	// "net/url"
 	"path/filepath"
 	"time"
 )
 
 type templateData struct {
-	CurrentYear int
-	Form        *forms.Form
-	FormData    url.Values
-	FormErrors  map[string]string
-	Snippet     *models.Snippet
-	Snippets    []*models.Snippet
+	CurrentYear       int
+	Form              *forms.Form
+	Flash             string
+	Snippet           *models.Snippet
+	Snippets          []*models.Snippet
+	AuthenticatedUser int
+	CSRFToken         string
 }
 
 func humanDate(t time.Time) string {
