@@ -16,12 +16,16 @@ type templateData struct {
 	Flash             string
 	Snippet           *models.Snippet
 	Snippets          []*models.Snippet
-	AuthenticatedUser int
+	AuthenticatedUser *models.User
 	CSRFToken         string
 }
 
 func humanDate(t time.Time) string {
-	return t.Format("01 Jan 2024 at 01:01")
+	if t.IsZero() {
+		return ""
+	}
+
+	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
 var functions = template.FuncMap{

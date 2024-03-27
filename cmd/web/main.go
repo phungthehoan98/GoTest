@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"flag"
+	"go_test/pkg/models"
 	"go_test/pkg/models/mysql"
 	"html/template"
 	"log"
@@ -16,12 +17,22 @@ import (
 )
 
 type application struct {
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	snippets      *mysql.SnippetModel
+	errorLog *log.Logger
+	infoLog  *log.Logger
+	// snippets      *mysql.SnippetModel
+	snippets interface {
+		Insert(string, string, string) (int, error)
+		Get(int) (*models.Snippet, error)
+		Latest() ([]*models.Snippet, error)
+	}
 	session       *sessions.Session
 	templateCache map[string]*template.Template
-	users         *mysql.UserModel
+	// users         *mysql.UserModel
+	users interface {
+		Insert(string, string, string) error
+		Authenticate(string, string) (int, error)
+		Get(int) (*models.User, error)
+	}
 }
 
 type ExampleModel struct {

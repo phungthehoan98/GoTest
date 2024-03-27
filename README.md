@@ -31,6 +31,7 @@ Go Test for the new language
      
 # Start: 
     export SNIPPETBOX_ADDR=":9999"
-    go run cmd/web/* -addr=$SNIPPETBOX_ADDR
+    go run ./cmd/web/!(*_test).go -addr=$SNIPPETBOX_ADDR
 # Note: 
     9999 is your port want to use (https://localhost:9999/)
+    run test get coverage `go tool cover -html=/tmp/profile.out`
